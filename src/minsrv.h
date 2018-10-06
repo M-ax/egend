@@ -1,4 +1,8 @@
-#include "fcgio.h"
+#include <stdio.h>
+#include <uWS/uWS.h>
+
+using namespace std;
+using namespace uWS;
 
 class MinSrv
 {
@@ -8,5 +12,5 @@ public:
   MinSrv(void);
 
   void listenForRequests();
-  void processRequest(FCGX_Request);
+  void onRequest(WebSocket<SERVER>*, char*, size_t, OpCode);
 };
