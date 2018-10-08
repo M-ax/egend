@@ -4,13 +4,15 @@
 using namespace std;
 using namespace uWS;
 
-class MinSrv
-{
+class MinSrv {
 private:
-  int socket;
+  Hub socketHub;
+  const char *host;
+  int port;
+  long lastMessageTime;
 public:
-  MinSrv(void);
+  MinSrv(const char*, int);
 
-  void listenForRequests();
-  void onRequest(WebSocket<SERVER>*, char*, size_t, OpCode);
+  void run();
+  void onMessage(WebSocket<SERVER>*, char*, size_t, OpCode);
 };

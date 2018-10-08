@@ -2,8 +2,7 @@
 
 #include "servo.h"
 
-class Control
-{
+class Control {
 private:
   Control(void);
 
