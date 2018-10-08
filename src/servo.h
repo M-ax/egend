@@ -1,7 +1,6 @@
 #include <wiringPi.h>
 
-class Servo
-{
+class Servo {
 private:
   int _hwpin, _hwmin, _hwmax, _hwpos, _hwmid;
   void internalSet();

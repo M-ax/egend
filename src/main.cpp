@@ -8,8 +8,7 @@
 
 using namespace std;
 
-int main(void)
-{
+int main(void){
   printf("EGEN 310 control app v0.1 starting...\n");
 
   printf("Setting up wiringPi parameters...\n");
@@ -45,11 +44,8 @@ int main(void)
   return 0;
 }
 
-void serverThread(void)
-{
-  MinSrv srv;
+void serverThread(void){
+  MinSrv srv("127.0.0.1", 8000);
 
-  while (true){
-    srv.listenForRequests();
-  }
+  srv.run();
 }

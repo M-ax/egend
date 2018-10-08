@@ -3,9 +3,13 @@ var controller = {
   gamepad: null,
 
   getLStickY: function(){
+    if (controller.gamepad === null)
+      return 0;
     return clampDeadZone(controller.gamepad.axes[1], 0.12);
   },
   getRStickX: function(){
+    if (controller.gamepad === null)
+      return 0;
     return clampDeadZone(controller.gamepad.axes[2], 0.05);
   },
 

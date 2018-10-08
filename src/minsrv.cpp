@@ -1,85 +1,60 @@
 #include <iostream>
 #include <string>
+#include <chrono>
 
 #include "minsrv.h"
 #include "control.h"
 
 using namespace std;
+using namespace std::chrono;
 
-MinSrv::MinSrv(){
-  //Init cgi socket to talk to Nginx
-  this->socket = FCGX_OpenSocket("127.0.0.1:8000", 500);
-  FCGX_Init();
-}
+MinSrv::MinSrv(const char *host, int port){
+  this->host = host;
+  this->port = port;
 
-void MinSrv::listenForRequests()
-{
-  FCGX_Request request;
-  FCGX_InitRequest(&request, this->socket, 0);
-
-  while (FCGX_Accept_r(&request) == 0) {
-    processRequest(request);
-  }
-}
-
-void MinSrv::processRequest(FCGX_Request request){
-  //Make stream buffers for the request's in, out, and err
-  fcgi_streambuf rInBuf(request.in);
-  fcgi_streambuf rOutBuf(request.out);
-  fcgi_streambuf rErrBuf(request.err);
-
-  //Make streams on the buffers manage input and output
-  std::istream rIn(&rInBuf);
-  std::ostream rOut(&rOutBuf);
-  std::ostream rErr(&rErrBuf);
-
-  //Get the request uri and content length
-  //Both set by Nginx fastcgi_param
-  char *reqUri = FCGX_GetParam("REQUEST_URI", request.envp);
-  char *contentLengthStr = FCGX_GetParam("CONTENT_LENGTH", request.envp);
-
-  printf("Received request from user, URI: \"%s\"\n", reqUri);
-
-  //Convert number string to usable number.
-  unsigned long contentLength = 0;
-  if (contentLengthStr){
-    contentLength = strtol(contentLengthStr, &contentLengthStr, 10);
-
-    //End pointer is null, content length was parsed correctly.
-    if (!*contentLengthStr && contentLength > 0){
-      //Read post data into buffer.
-      char *buf = new char[contentLength + 1];
-      rIn.read(buf, contentLength);
-
-      /*
-        Something with istream or fcgi_streambuf is fucky.
-        Without setting a null terminator at the end, the buffer gets overrun
-          with extra garbled data past the end.
-      */
-      buf[contentLength] = '\0';
-
-      //Read useful information out of buffer.
-      double throttleVal, steeringVal;
-      throttleVal = -strtod(buf, &buf);
-      steeringVal = strtod(buf, &buf);
-
-      Control::setSteeringPosition(steeringVal);
+  /*
+    [this](format){
+      is;
+      suck;
     }
+  */
+  //TODO: This has to be retarded, cast &onMessage to std::function somehow
+  socketHub.onMessage(
+    [this](uWS::WebSocket<uWS::SERVER> *ws, char *message, size_t length, uWS::OpCode opCode) {
+      this->onMessage(ws, message, length, opCode);
+    }
+  );
+}
+
+void MinSrv::run(){
+  //if (socketHub.listen(host, port)){
+  if (socketHub.listen(port)){
+    cout << "Listening on " << host << ":" << port << "\n";
+    socketHub.run();
   }
-  if (contentLength == 0) {
-    //No POST content means client crisis
-    printf("!! Content length zero or absent.  Stopping all motors.\n");
-
-    //Respond and finish request.
-    rOut << "Content-type: text/plain\r\n\r\n";
-    return;
+  else {
+    cout << "Yo it ate shit homie" << "\n";
   }
+}
 
-  rOut
-    //Write out headers
-    << "Content-type: text/plain\r\n\r\n"
+void MinSrv::onMessage(WebSocket<SERVER> *ws, char *message, size_t length, OpCode opCode){
+  long timestamp = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+  //Null terminate after length, don't give a shit about protocol info.
+  //GIMME THAT DATA
+  message[length] = '\0';
 
-    //Then content
-    << "Current servo position: " << Control::getSteeringPosition() << "\n"
-    << "Request URI: " << reqUri;
+  cout << "now: " << timestamp
+    << "; last: " << lastMessageTime
+    << "; hz: " << (1000. / (timestamp - lastMessageTime)) << "\n";
+
+  //Read useful information out of message.
+  double throttleVal, steeringVal;
+  throttleVal = -strtod(message, &message);
+  steeringVal = strtod(message, &message);
+
+  Control::setSteeringPosition(steeringVal);
+
+  //ws->send("ACK", 3, opCode);
+
+  lastMessageTime = timestamp;
 }

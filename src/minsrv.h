@@ -1,12 +1,18 @@
-#include "fcgio.h"
+#include <stdio.h>
+#include <uWS/uWS.h>
 
-class MinSrv
-{
+using namespace std;
+using namespace uWS;
+
+class MinSrv {
 private:
-  int socket;
+  Hub socketHub;
+  const char *host;
+  int port;
+  long lastMessageTime;
 public:
-  MinSrv(void);
+  MinSrv(const char*, int);
 
-  void listenForRequests();
-  void processRequest(FCGX_Request);
+  void run();
+  void onMessage(WebSocket<SERVER>*, char*, size_t, OpCode);
 };
