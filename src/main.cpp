@@ -9,7 +9,7 @@
 using namespace std;
 
 int main(void){
-  printf("EGEN 310 control app v0.1 starting...\n");
+  printf("EGEN 310 control app v0.2 starting...\n");
 
   printf("Setting up wiringPi parameters...\n");
   Control::init();

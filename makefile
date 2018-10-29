@@ -6,7 +6,7 @@ OBJ_DIR = obj
 SRC = $(wildcard $(SRC_DIR)/*.cpp)
 OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
-LDLIBS += -lwiringPi -lpthread -lssl -lz -luWS
+LDLIBS += -lpthread -lssl -lz -luWS -lpca9685 -lbcm2835
 
 all: $(EXE)
 

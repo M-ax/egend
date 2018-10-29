@@ -7,10 +7,10 @@ var controller = {
       return 0;
     return clampDeadZone(controller.gamepad.axes[1], 0.12);
   },
-  getRStickX: function(){
+  getRStickY: function(){
     if (controller.gamepad === null)
       return 0;
-    return clampDeadZone(controller.gamepad.axes[2], 0.05);
+    return clampDeadZone(controller.gamepad.axes[3], 0.05);
   },
 
   connected: function(ev){

@@ -8,8 +8,6 @@ function initConnection(){
 
   socketCon.onopen = function () {
     console.log("Connected to websocket server.");
-
-    dataLoop = setTimeout(sendDataToEgend, loopDelay);
   };
 
   socketCon.onerror = function (error) {
@@ -21,18 +19,23 @@ function initConnection(){
   };
 }
 
+function startDataLoop(){
+  dataLoop = setInterval(sendDataToEgend, loopDelay);
+}
+
+function stopDataLoop(){
+  clearInterval(dataLoop);
+}
+
 function sendDataToEgend(){
   if (socketCon === null){
     initConnection();
   }
 
   var dat = roundToString(controller.getLStickY())
-    + " " + roundToString(controller.getRStickX())
-    + " " + roundToString(Math.random());
+    + " " + roundToString(-controller.getRStickY());
 
   socketCon.send(dat);
-
-  dataLoop = setTimeout(sendDataToEgend, loopDelay);
 }
 
 function roundToString(num){

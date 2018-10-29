@@ -1,20 +1,21 @@
-#include <wiringPi.h>
+#include "motor.h"
 
-#include "servo.h"
+#ifndef CONTROL_H
+#define CONTROL_H
 
 class Control {
 private:
   Control(void);
-
-
-  //Motor driveLeftFront;
-  //Motor driveRightFront;
-  //Motor driveLeftRear;
-  //Motor driveRightRear;
 public:
-  static Servo *steeringServo;
+  static PCA9685 pwmController;
+  static Motor *driveFrontRight;
+  static Motor *driveFrontLeft;
+  static Motor *driveRearRight;
+  static Motor *driveRearLeft;
 
   static void init();
-  static void setSteeringPosition(double);
-  static int getSteeringPosition();
+  static void setLeftThrottle(double);
+  static void setRightThrottle(double);
 };
+
+#endif

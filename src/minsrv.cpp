@@ -12,12 +12,6 @@ MinSrv::MinSrv(const char *host, int port){
   this->host = host;
   this->port = port;
 
-  /*
-    [this](format){
-      is;
-      suck;
-    }
-  */
   //TODO: This has to be retarded, cast &onMessage to std::function somehow
   socketHub.onMessage(
     [this](uWS::WebSocket<uWS::SERVER> *ws, char *message, size_t length, uWS::OpCode opCode) {
@@ -33,12 +27,12 @@ void MinSrv::run(){
     socketHub.run();
   }
   else {
-    cout << "Yo it ate shit homie" << "\n";
+    cout << "Control backend is dead.  Socket collision?" << "\n";
   }
 }
 
 void MinSrv::onMessage(WebSocket<SERVER> *ws, char *message, size_t length, OpCode opCode){
-  long timestamp = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+  int64_t timestamp = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
   //Null terminate after length, don't give a shit about protocol info.
   //GIMME THAT DATA
   message[length] = '\0';
@@ -48,11 +42,12 @@ void MinSrv::onMessage(WebSocket<SERVER> *ws, char *message, size_t length, OpCo
     << "; hz: " << (1000. / (timestamp - lastMessageTime)) << "\n";
 
   //Read useful information out of message.
-  double throttleVal, steeringVal;
-  throttleVal = -strtod(message, &message);
-  steeringVal = strtod(message, &message);
+  double leftThrottleVal, rightThrottleVal;
+  leftThrottleVal = strtod(message, &message);
+  rightThrottleVal = strtod(message, &message);
 
-  Control::setSteeringPosition(steeringVal);
+  Control::setLeftThrottle(leftThrottleVal);
+  Control::setRightThrottle(rightThrottleVal);
 
   //ws->send("ACK", 3, opCode);
 
