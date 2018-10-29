@@ -37,14 +37,14 @@ void MinSrv::onMessage(WebSocket<SERVER> *ws, char *message, size_t length, OpCo
   //GIMME THAT DATA
   message[length] = '\0';
 
-  cout << "now: " << timestamp
-    << "; last: " << lastMessageTime
-    << "; hz: " << (1000. / (timestamp - lastMessageTime)) << "\n";
-
   //Read useful information out of message.
   double leftThrottleVal, rightThrottleVal;
   leftThrottleVal = strtod(message, &message);
   rightThrottleVal = strtod(message, &message);
+
+  cout << "left: " << leftThrottleVal
+    << " ; right: " << rightThrottleVal
+    << " ; hz: " << (1000. / (timestamp - lastMessageTime)) << "\n";
 
   Control::setLeftThrottle(leftThrottleVal);
   Control::setRightThrottle(rightThrottleVal);
