@@ -20,11 +20,14 @@ function initConnection(){
 }
 
 function startDataLoop(){
-  dataLoop = setInterval(sendDataToEgend, loopDelay);
+  if (dataLoop === null)
+    dataLoop = setInterval(sendDataToEgend, loopDelay);
 }
 
 function stopDataLoop(){
   clearInterval(dataLoop);
+
+  dataLoop = null;
 }
 
 function sendDataToEgend(){
